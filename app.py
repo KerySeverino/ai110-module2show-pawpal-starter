@@ -117,7 +117,7 @@ if st.button("Generate schedule"):
         else:
             st.session_state.scheduler.schedule_tasks(all_tasks)
             st.success("Schedule generated!")
-            st.text(st.session_state.scheduler.explain_plan())
+            st.code(st.session_state.scheduler.explain_plan(), language=None)
 
             conflicts = st.session_state.scheduler.detect_conflicts(all_tasks)
             if conflicts:
@@ -127,8 +127,8 @@ if st.button("Generate schedule"):
 
 st.divider()
 
-# --- Phase 4: Filter, Sort & Manage Tasks ---
-st.subheader("Phase 4: Filter, Sort & Manage Tasks")
+# --- Step 5: Filter, Sort & Manage Tasks ---
+st.subheader("Step 5: Manage Tasks")
 
 if st.session_state.owner and st.session_state.owner.get_pets():
     scheduler = st.session_state.scheduler
