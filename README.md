@@ -51,3 +51,13 @@ Phase 4 added several improvements to how PawPal+ handles tasks:
 - **Filtering by pet** — tasks can be scoped to a single pet, useful when managing care schedules for multiple animals.
 - **Recurring tasks** — tasks can be set to repeat `daily` or `weekly`. When a recurring task is marked complete, the next occurrence is automatically created and added to that pet's schedule.
 - **Conflict detection** — any two tasks sharing the same `(due_date, due_time)` are flagged with a warning so the owner can reschedule before the conflict becomes a problem.
+
+## Testing PawPal+
+
+To run the automated tests for PawPal+, use:
+
+python -m pytest
+
+The test suite checks core system behaviors such as task completion, adding tasks to pets, sorting tasks in chronological order, recurring task generation, conflict detection, and handling pets with no tasks.
+
+Confidence Level: 4
