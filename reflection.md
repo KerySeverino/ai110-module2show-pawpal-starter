@@ -7,10 +7,17 @@
 - Briefly describe your initial UML design.
 - What classes did you include, and what responsibilities did you assign to each?
 
+
+My UML design included four classes: Owner, Pet, Task, and Scheduler. Owner manages pets, Pet stores pet information and its tasks, Task represents actions like feedings or walks, and Scheduler organizes and prioritizes tasks.
+
 **b. Design changes**
 
 - Did your design change during implementation?
 - If yes, describe at least one change and why you made it.
+
+
+Yes. I moved most scheduling logic into the Scheduler class instead of keeping it inside Pet. This kept responsibilities clearer and made the design more modular.
+
 
 ---
 
