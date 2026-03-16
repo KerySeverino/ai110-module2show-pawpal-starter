@@ -41,3 +41,13 @@ pip install -r requirements.txt
 5. Add tests to verify key behaviors.
 6. Connect your logic to the Streamlit UI in `app.py`.
 7. Refine UML so it matches what you actually built.
+
+## Smarter Scheduling
+
+Phase 4 added several improvements to how PawPal+ handles tasks:
+
+- **Sorting by due date and time** — the schedule is now ordered by `(due_date, due_time)` so tasks appear in true chronological order across multiple days.
+- **Filtering by status** — owners can view only `pending` or `complete` tasks to stay focused on what still needs doing.
+- **Filtering by pet** — tasks can be scoped to a single pet, useful when managing care schedules for multiple animals.
+- **Recurring tasks** — tasks can be set to repeat `daily` or `weekly`. When a recurring task is marked complete, the next occurrence is automatically created and added to that pet's schedule.
+- **Conflict detection** — any two tasks sharing the same `(due_date, due_time)` are flagged with a warning so the owner can reschedule before the conflict becomes a problem.

@@ -33,6 +33,8 @@ Yes. I moved most scheduling logic into the Scheduler class instead of keeping i
 - Describe one tradeoff your scheduler makes.
 - Why is that tradeoff reasonable for this scenario?
 
+One tradeoff my scheduler makes is that conflict detection only checks for exact matches in due date and due time instead of overlapping time ranges. This keeps the logic simpler and easier to understand, even though it does not catch every possible scheduling conflict.
+
 ---
 
 ## 3. AI Collaboration

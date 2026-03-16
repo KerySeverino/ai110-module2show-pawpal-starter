@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from typing import List
 
 PRIORITY_ORDER = {"high": 0, "medium": 1, "low": 2}
@@ -13,6 +14,8 @@ class Task:
     status: str
     duration_minutes: int
     due_time: str
+    due_date: str = ""      # "YYYY-MM-DD"; empty means no specific date
+    recurrence: str = ""    # "" | "daily" | "weekly"
 
     def is_high_priority(self) -> bool:
         """Return True if the task priority is 'high'."""
@@ -21,6 +24,35 @@ class Task:
     def mark_complete(self) -> None:
         """Set the task status to 'complete'."""
         self.status = "complete"
+
+    def next_occurrence(self) -> Task:
+        """Return a new pending Task scheduled for the next recurrence date.
+
+        Advances due_date by 1 day for 'daily' or 7 days for 'weekly'.
+        Raises ValueError if recurrence or due_date is not set.
+        """
+        if not self.recurrence:
+            raise ValueError(f"Task '{self.title}' has no recurrence set.")
+        if not self.due_date:
+            raise ValueError(f"Task '{self.title}' has no due_date set.")
+        current = datetime.strptime(self.due_date, "%Y-%m-%d")
+        if self.recurrence == "daily":
+            delta = timedelta(days=1)
+        elif self.recurrence == "weekly":
+            delta = timedelta(weeks=1)
+        else:
+            raise ValueError(f"Unsupported recurrence value: '{self.recurrence}'. Use 'daily' or 'weekly'.")
+        next_date = (current + delta).strftime("%Y-%m-%d")
+        return Task(
+            title=self.title,
+            task_type=self.task_type,
+            priority=self.priority,
+            status="pending",
+            duration_minutes=self.duration_minutes,
+            due_time=self.due_time,
+            due_date=next_date,
+            recurrence=self.recurrence,
+        )
 
 
 @dataclass
@@ -74,23 +106,25 @@ class Scheduler:
         self.scheduled_tasks: List[Task] = []
 
     def schedule_tasks(self, tasks: List[Task]) -> List[Task]:
-        """Sort tasks by due_time and store them as the current scheduled plan."""
-        self.scheduled_tasks = sorted(tasks, key=lambda t: t.due_time)
+        """Sort tasks by (due_date, due_time) and store them as the current scheduled plan."""
+        self.scheduled_tasks = sorted(tasks, key=lambda t: (t.due_date, t.due_time))
         return self.scheduled_tasks
 
     def prioritize_tasks(self, tasks: List[Task]) -> List[Task]:
         """Return tasks sorted high-priority first, then medium, then low."""
         return sorted(tasks, key=lambda t: PRIORITY_ORDER.get(t.priority, 99))
 
+    def filter_by_status(self, tasks: List[Task], status: str) -> List[Task]:
+        """Return only tasks whose status matches the given value (e.g. 'pending' or 'complete')."""
+        return [t for t in tasks if t.status == status]
+
     def detect_conflicts(self, tasks: List[Task]) -> List[Task]:
-        """Return all tasks that share a due_time with at least one other task."""
-        time_counts = {}
+        """Return all tasks that share a (due_date, due_time) with at least one other task."""
+        time_counts: dict = {}
         for task in tasks:
-            if task.due_time in time_counts:
-                time_counts[task.due_time] += 1
-            else:
-                time_counts[task.due_time] = 1
-        return [t for t in tasks if time_counts[t.due_time] > 1]
+            key = (task.due_date, task.due_time)
+            time_counts[key] = time_counts.get(key, 0) + 1
+        return [t for t in tasks if time_counts[(t.due_date, t.due_time)] > 1]
 
     def explain_plan(self) -> str:
         """Return a multi-line string summarizing each task in the current schedule."""
@@ -98,6 +132,6 @@ class Scheduler:
             return "No tasks scheduled yet."
         lines = []
         for task in self.scheduled_tasks:
-            line = f"- {task.title} | Due: {task.due_time} | Priority: {task.priority}"
+            line = f"- {task.title} | Due: {task.due_date} {task.due_time} | Priority: {task.priority}"
             lines.append(line)
         return "\n".join(lines)
